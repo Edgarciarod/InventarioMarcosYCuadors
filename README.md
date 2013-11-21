@@ -1,4 +1,2 @@
-InventarioMarcosYCuadros
-========================
-
-Primera version.
+Inventario Marcos Y Cuadros
+===========================

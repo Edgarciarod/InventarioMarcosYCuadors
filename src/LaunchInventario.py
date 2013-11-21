@@ -7,10 +7,6 @@ class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
 
-    def onButtonPressed(self, button):
-        print( "Hello World!" )
-
-
 class MainWin:
     def __init__(self):
         builder = Gtk.Builder()
@@ -19,10 +15,12 @@ class MainWin:
         builder.connect_signals(Handler())
 
         self.TreeView = builder.get_object("treeview")
+
         self.initTreeView()
 
     def initTreeView(self):
-        lista = Gtk.ListStore(int, str, str, float, float, float, int, str)
+
+        self.lista = Gtk.ListStore(str, str, str, str, str, str, str, str)
 
         render = Gtk.CellRendererText()
 
@@ -35,9 +33,10 @@ class MainWin:
                    Gtk.TreeViewColumn("Estado", render, text = 6),
                    Gtk.TreeViewColumn("Tienda", render, text = 7)]
 
-        self.TreeView.set_model(lista)
+        self.TreeView.set_model(self.lista)
 
         for col in columna:
+            col.set_resizable(True)
             self.TreeView.append_column(col)
 
 if __name__ == "__main__":

@@ -2,13 +2,14 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
+from modules import NuevaOrden
 
 class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
 
-    def NuevaOrdenSalida(self):
-        datos = LaunchNuevaOrden()
+    def NuevaOrdenSalida(self, button):
+        datos = NuevaOrden()
         MainWin.addTreeView(datos)
 
 class MainWin:

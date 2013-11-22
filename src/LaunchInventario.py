@@ -4,6 +4,7 @@
 from gi.repository import Gtk
 from modules import NuevaOrden
 
+
 class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
@@ -47,6 +48,5 @@ class MainWin:
             self.TreeView.append_column(col)
 
 if __name__ == "__main__":
-
     MainWin()
     Gtk.main()

@@ -7,6 +7,10 @@ class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
 
+    def NuevaOrdenSalida(self):
+        datos = LaunchNuevaOrden()
+        MainWin.addTreeView(datos)
+
 class MainWin:
     def __init__(self):
         builder = Gtk.Builder()
@@ -18,10 +22,12 @@ class MainWin:
 
         self.initTreeView()
 
+    def addTreeView(self, datos):
+        self.lista.append(datos)
+
     def initTreeView(self):
 
         self.lista = Gtk.ListStore(str, str, str, str, str, str, str, str)
-
         render = Gtk.CellRendererText()
 
         columna = [Gtk.TreeViewColumn("Folio", render, text = 0),
@@ -40,5 +46,6 @@ class MainWin:
             self.TreeView.append_column(col)
 
 if __name__ == "__main__":
+
     MainWin()
     Gtk.main()

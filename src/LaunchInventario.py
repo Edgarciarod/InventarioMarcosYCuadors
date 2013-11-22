@@ -10,7 +10,7 @@ class Handler:
         Gtk.main_quit(*args)
 
     def NuevaOrdenSalida(self, button):
-        datos = NuevaOrden()
+        datos = NuevaOrden.NuevaOrden()
         MainWin.addTreeView(datos)
 
 class MainWin:

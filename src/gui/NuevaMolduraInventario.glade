@@ -4,10 +4,8 @@
   <object class="GtkWindow" id="window1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="is_focus">True</property>
     <property name="window_position">center</property>
     <property name="type_hint">dialog</property>
-    <signal name="destroy" handler="onDestroyWindow" swapped="no"/>
     <child>
       <object class="GtkGrid" id="grid1">
         <property name="visible">True</property>
@@ -24,10 +22,10 @@
             <property name="row_homogeneous">True</property>
             <property name="column_homogeneous">True</property>
             <child>
-              <object class="GtkLabel" id="FolioLabel">
+              <object class="GtkLabel" id="ClaveInternaLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Folio</property>
+                <property name="label" translatable="yes">Clave Interna</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -37,10 +35,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ClaveMolduraLabel">
+              <object class="GtkLabel" id="CantidadLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Clave de Moldura</property>
+                <property name="label" translatable="yes">Cantidad</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -50,49 +48,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="CantidadBaseLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Tamaño de la base</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">2</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="CantidadAlturaLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Tamaño de la altura</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">3</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="IDTiendaLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">ID de la Tienda</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">4</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="FolioEntry">
+              <object class="GtkEntry" id="ClaveInternaEntry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">●</property>
+                <property name="invisible_char_set">True</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -102,53 +62,15 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="ClaveMolduraEntry">
+              <object class="GtkEntry" id="CantidadEntry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">●</property>
+                <property name="invisible_char_set">True</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="top_attach">1</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="CantBaseEntry">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">●</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">2</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="CantAlturaEntry">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">●</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">3</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="IDTiendaEntry">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">●</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">4</property>
                 <property name="width">1</property>
                 <property name="height">1</property>
               </packing>
@@ -175,7 +97,8 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <signal name="clicked" handler="AgregarButton_clicked" swapped="no"/>
+                <signal name="destroy" handler="onDestroyWindow" swapped="no"/>
+                <signal name="clicked" handler="AddMoldura_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -190,7 +113,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <signal name="clicked" handler="CancelarButton_clicked" swapped="no"/>
+                <signal name="clicked" handler="Cancel_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>

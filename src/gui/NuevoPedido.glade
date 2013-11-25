@@ -5,6 +5,7 @@
     <property name="can_focus">False</property>
     <property name="window_position">center</property>
     <property name="type_hint">dialog</property>
+    <signal name="destroy" handler="onDestroyWindow" swapped="no"/>
     <child>
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
@@ -245,6 +246,7 @@
                   <object class="GtkTreeView" id="treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <signal name="destroy" handler="onDestroyWindow" swapped="no"/>
                     <child internal-child="selection">
                       <object class="GtkTreeSelection" id="treeview-selection"/>
                     </child>

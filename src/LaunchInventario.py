@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NuevoPedido, NewInventario
+from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -11,6 +11,7 @@ class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
 
+
     def CapturarInventario(self, *args):
         cursor  = db.cursor()
         cursor.execute("TRUNCATE TABLE inventario_temporal")
@@ -18,22 +19,23 @@ class Handler:
         cursor.close()
         NewInventario.NewInventario()
 
+
     def NuevaOrdenSalida(self, button):
         NuevaOrden.NuevaOrden()
         MainW.lista.clear()
         MainWin.addTreeView(MainW)
-        #MainWin.addTreeView()
+
 
     def ProcesarOrden(self, button):
         global db
         (model, iter) = MainW.TreeView.get_selection().get_selected()
 
         if iter != None:
-            folio  = int(list(model[iter])[0])
-            estado = int(list(model[iter])[7])
-            clave_moldura = list(model[iter])[1]
-            total = float(list(model[iter])[5])
-
+            datos = list(model[iter])
+            folio  = int(datos[0])
+            estado = int(datos[7])
+            clave_moldura = datos[1]
+            total = float(datos[5])
 
             if estado == 0:
                 dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -42,10 +44,7 @@ class Handler:
                 for i in dict_cursor:
                     moldura_id = i['moldura_id']
 
-                print (moldura_id)
-
                 dict_cursor.execute("SELECT cantidad FROM inventario_teorico WHERE moldura_id = %s",(moldura_id,))
-
                 for i in dict_cursor:
                     cantidad = i['cantidad']
 
@@ -55,7 +54,6 @@ class Handler:
                         db.commit()
                         MainW.lista.clear()
                         MainWin.addTreeView(MainW)
-
                 except UnboundLocalError:
                     pass
 
@@ -78,6 +76,10 @@ class Handler:
 
     def CapturarPedido(self, button):
         NuevoPedido.NuevoPedido()
+
+
+    def CatalogoMaestro(self, button):
+        CatalogoMaestro.CatalogoMaestro()
 
 class MainWin:
     def __init__(self):

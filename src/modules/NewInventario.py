@@ -36,6 +36,16 @@ class Handler:
             MainW.lista.clear()
             WinNewInventario.addTreeView(MainW)
 
+    def Accept_clicked(self, button):
+        cursor = db.cursor()
+        cursor.execute("TRUNCATE TABLE inventario_real")
+        cursor.execute("TRUNCATE TABLE inventario_teorico")
+        cursor.execute("SELECT copia_inv_temp()")
+        cursor.execute("TRUNCATE TABLE inventario_temporal")
+        db.commit()
+        window = builder.get_object("window1")
+        window.destroy()
+
     def Cancel_clicked(self, button):
         window = builder.get_object("window1")
         window.destroy()

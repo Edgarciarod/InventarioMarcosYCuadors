@@ -24,7 +24,7 @@ class Handler:
 
                 print(moldura_id)
 
-                cursor.execute("INSERT INTO inventario_temporal(moldura_id, cantidad) VALUES(%s, %s)", (moldura_id, int(cantidad)))
+                cursor.execute("INSERT INTO inventario_temporal(moldura_id, cantidad) VALUES(%s, %s)", (moldura_id, float(cantidad)))
             except (psycopg2.IntegrityError, UnboundLocalError, ValueError):
                 db.rollback()
             else:

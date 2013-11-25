@@ -14,6 +14,9 @@ db = psycopg2.connect(database='Almacen',
 
 class Handler:
 
+    def onDestroyWindow(self, *args):
+        Gtk.main_quit(*args)
+
     def AceptarButton_clicked(self, button):
         global db, MainWin
         try:

@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NewInventario
+from modules import NuevaOrden, NuevoPedido, NewInventario
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -75,6 +75,9 @@ class Handler:
                 db.commit()
                 dict_cursor.close()
 
+
+    def CapturarPedido(self, button):
+        NuevoPedido.NuevoPedido()
 
 class MainWin:
     def __init__(self):

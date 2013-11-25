@@ -28,7 +28,7 @@ class MainWin:
         self.initTreeView()
 
     def addTreeView(self, datos):
-        self.lista.append(datos)
+            self.lista.append(datos)
 
     def initTreeView(self):
 

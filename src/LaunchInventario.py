@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro
+from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -80,6 +80,10 @@ class Handler:
 
     def CatalogoMaestro(self, button):
         CatalogoMaestro.CatalogoMaestro()
+
+
+    def ReportarMerma(self, button):
+        ReportarMerma.ReportarMerma()
 
 class MainWin:
     def __init__(self):

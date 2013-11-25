@@ -13,7 +13,7 @@ class Handler:
         Cantidad     = builder.get_object("CantidadEntry")
 
         clave_interna = ClaveInterna.get_text()
-        cantidad      = Cantidad.get_text()
+        cantidad      = float(Cantidad.get_text())
 
         try:
             cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -22,9 +22,15 @@ class Handler:
                 datos = list(cursor)
                 moldura_id = datos[0]['moldura_id']
 
-                print(moldura_id)
+                cursor.execute("SELECT cantidad FROM inventario_teorico WHERE moldura_id = %s", (moldura_id,))
+                datos = list(cursor)
+                cantidad_actual = datos[0]['cantidad']
 
-                cursor.execute("INSERT INTO inventario_temporal(moldura_id, cantidad) VALUES(%s, %s)", (moldura_id, float(cantidad)))
+                print (cantidad, cantidad_actual)
+                if len(datos) > 0 and cantidad <= cantidad_actual:
+                    cursor.execute("INSERT INTO inventario_desperdicio(moldura_id, cantidad) VALUES(%s, %s)", (moldura_id, cantidad))
+                else:
+                    pass
             except (psycopg2.IntegrityError, UnboundLocalError, ValueError):
                 db.rollback()
             else:
@@ -39,7 +45,7 @@ class Handler:
         window = builder.get_object("window1")
         window.destroy()
 
-class WinNuevaMolduraInventario:
+class WinReportarMerma:
     def __init__(self):
         global builder
 
@@ -47,9 +53,9 @@ class WinNuevaMolduraInventario:
         builder.add_from_file("gui/NuevaMolduraInventario.glade")
         builder.connect_signals(Handler())
 
-def NuevaMolduraInventario():
+def ReportarMerma():
     global db
-    WinNuevaMolduraInventario()
+    WinReportarMerma()
     db = psycopg2.connect(database = 'Almacen',
                           user = 'postgres',
                           password = 'homojuezhomojuezhomojuez',

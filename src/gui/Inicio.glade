@@ -259,6 +259,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="ConsultaInventario" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -272,6 +273,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="ReportarMerma" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -298,6 +300,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="CatalogoMaestro" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>

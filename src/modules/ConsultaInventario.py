@@ -2,7 +2,6 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaMolduraInventario, EditarMolduraInventario
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -11,52 +10,18 @@ class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
 
-    def NuevaMoldura_clicked(self, button):
-        NuevaMolduraInventario.NuevaMolduraInventario()
-        MainW.lista.clear()
-        WinNewInventario.addTreeView(MainW)
-
-    def Editar_clicked(self, button):
-        (model, iter) = MainW.TreeView.get_selection().get_selected()
-        if iter != None:
-            clave_interna = list(model[iter])[0]
-            EditarMolduraInventario.EditarMolduraInventario(clave_interna)
-            MainW.lista.clear()
-            WinNewInventario.addTreeView(MainW)
-
-    def Eliminar_clicked(self, button):
-        cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        (model, iter) = MainW.TreeView.get_selection().get_selected()
-        if iter != None:
-            clave_interna = list(model[iter])[0]
-            cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s", (clave_interna))
-            datos = list(cursor)
-            moldura_id = datos[0]['moldura_id']
-            cursor.execute("DELETE FROM inventario_temporal WHERE moldura_id = %s", (int(moldura_id),))
-            MainW.lista.clear()
-            WinNewInventario.addTreeView(MainW)
-
     def Accept_clicked(self, button):
-        cursor = db.cursor()
-        cursor.execute("TRUNCATE TABLE inventario_real")
-        cursor.execute("TRUNCATE TABLE inventario_teorico")
-        cursor.execute("SELECT copia_inv_temp()")
-        cursor.execute("TRUNCATE TABLE inventario_temporal")
-        db.commit()
         window = builder.get_object("window1")
         window.destroy()
 
-    def Cancel_clicked(self, button):
-        window = builder.get_object("window1")
-        window.destroy()
 
-class WinNewInventario:
+class WinConsultaInventario:
     def __init__(self):
         global builder, MainW, db
         MainW = self
 
         builder = Gtk.Builder()
-        builder.add_from_file("gui/CapturarInventario.glade")
+        builder.add_from_file("gui/ConsultaInventario.glade")
         builder.connect_signals(Handler())
 
         self.TreeView = builder.get_object("treeview")
@@ -79,11 +44,13 @@ class WinNewInventario:
             col.set_resizable(True)
             self.TreeView.append_column(col)
 
+        self.addTreeView()
+
     def addTreeView(self):
         cursor  = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor2 = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        cursor.execute("SELECT moldura_id, cantidad FROM inventario_temporal")
+        cursor.execute("SELECT moldura_id, cantidad FROM inventario_teorico")
         for row in cursor:
             cursor2.execute("SELECT clave_interna, clave_proveedor, nombre_moldura, descripcion FROM maestro_moldura WHERE moldura_id = %s",(row['moldura_id'],))
             datos = list(cursor2)
@@ -98,12 +65,13 @@ class WinNewInventario:
         cursor.close()
         cursor2.close()
 
-def NewInventario():
+def ConsultaInventario():
     global db
     db = psycopg2.connect(database = 'Almacen',
                           user = 'postgres',
                           password = 'homojuezhomojuezhomojuez',
                           port = '5432',
                           host = '127.0.0.1')
-    WinNewInventario()
+    WinConsultaInventario()
     Gtk.main()
+__author__ = 'david'

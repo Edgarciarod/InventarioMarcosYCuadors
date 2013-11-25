@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma
+from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -84,6 +84,10 @@ class Handler:
 
     def ReportarMerma(self, button):
         ReportarMerma.ReportarMerma()
+
+
+    def ConsultaInventario(self, button):
+        ConsultaInventario.ConsultaInventario()
 
 class MainWin:
     def __init__(self):

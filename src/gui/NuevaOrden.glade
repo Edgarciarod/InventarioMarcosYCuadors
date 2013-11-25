@@ -2,8 +2,12 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkWindow" id="window1">
-    <property name="can_focus">False</property>
     <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="is_focus">True</property>
+    <property name="window_position">center</property>
+    <property name="type_hint">dialog</property>
+    <signal name="destroy" handler="onDestroyWindow" swapped="no"/>
     <child>
       <object class="GtkGrid" id="grid1">
         <property name="visible">True</property>
@@ -111,7 +115,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="BaseEntry">
+              <object class="GtkEntry" id="CantBaseEntry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">●</property>
@@ -124,7 +128,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="AlturaEntry">
+              <object class="GtkEntry" id="CantAlturaEntry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">●</property>
@@ -166,10 +170,11 @@
             <property name="layout_style">center</property>
             <child>
               <object class="GtkButton" id="AgregarButton">
-                <property name="label" translatable="yes">Agregar</property>
+                <property name="label">gtk-add</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
                 <signal name="clicked" handler="AgregarButton_clicked" swapped="no"/>
               </object>
               <packing>
@@ -180,10 +185,11 @@
             </child>
             <child>
               <object class="GtkButton" id="CancelarButton">
-                <property name="label" translatable="yes">Cancelar</property>
+                <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
                 <signal name="clicked" handler="CancelarButton_clicked" swapped="no"/>
               </object>
               <packing>

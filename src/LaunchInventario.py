@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden
+from modules import NuevaOrden, NuevoPedido
 
 
 class Handler:
@@ -12,6 +12,9 @@ class Handler:
     def NuevaOrdenSalida(self, button):
         datos = NuevaOrden.NuevaOrden()
         MainWin.addTreeView(datos)
+
+    def CapturarPedido(self, button):
+        NuevoPedido.NuevoPedido()
 
 class MainWin:
     def __init__(self):

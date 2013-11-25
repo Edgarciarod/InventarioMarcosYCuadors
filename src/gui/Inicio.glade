@@ -2,10 +2,12 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkWindow" id="window1">
+    <property name="width_request">1050</property>
+    <property name="height_request">500</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Inventario</property>
-    <property name="window_position">center-on-parent</property>
+    <property name="window_position">center</property>
     <signal name="destroy" handler="onDestroyWindow" swapped="no"/>
     <child>
       <object class="GtkGrid" id="grid1">
@@ -242,6 +244,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="CapturarInventario" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -310,15 +313,24 @@
               </packing>
             </child>
             <child>
-              <object class="GtkTreeView" id="treeview">
+              <object class="GtkScrolledWindow" id="scrolledwindow1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
-                <property name="reorderable">True</property>
-                <property name="rubber_banding">True</property>
-                <child internal-child="selection">
-                  <object class="GtkTreeSelection" id="treeview-selection"/>
+                <property name="shadow_type">in</property>
+                <child>
+                  <object class="GtkTreeView" id="treeview">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="reorderable">True</property>
+                    <property name="rubber_banding">True</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection" id="treeview-selection"/>
+                    </child>
+                  </object>
                 </child>
               </object>
               <packing>

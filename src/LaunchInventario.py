@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden
+from modules import NuevaOrden, NewInventario
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -10,6 +10,13 @@ global db, MainW
 class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
+
+    def CapturarInventario(self, *args):
+        cursor  = db.cursor()
+        cursor.execute("TRUNCATE TABLE inventario_temporal")
+        db.commit()
+        cursor.close()
+        NewInventario.NewInventario()
 
     def NuevaOrdenSalida(self, button):
         NuevaOrden.NuevaOrden()
@@ -44,7 +51,7 @@ class Handler:
 
                 try:
                     if total <= cantidad:
-                        dict_cursor.execute("UPDATE orden_salida_moldura SET estado = 1 WHERE folio = %s",(folio,))
+                        dict_cursor.execute("UPDATE orden_salida_moldura SET estado = 1, fecha_procesado = now() WHERE folio = %s",(folio,))
                         db.commit()
                         MainW.lista.clear()
                         MainWin.addTreeView(MainW)
@@ -62,7 +69,7 @@ class Handler:
             folio  = int(list(model[iter])[0])
             if estado == 0:
                 dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-                dict_cursor.execute("UPDATE orden_salida_moldura SET estado = 2 WHERE folio = %s",(folio,))
+                dict_cursor.execute("UPDATE orden_salida_moldura SET estado = 2, fecha_procesado = now() WHERE folio = %s",(folio,))
                 MainW.lista.clear()
                 MainWin.addTreeView(MainW)
                 db.commit()
@@ -121,7 +128,7 @@ class MainWin:
         render = Gtk.CellRendererText()
 
         columna = [Gtk.TreeViewColumn("Folio", render, text = 0),
-                   Gtk.TreeViewColumn("Clave", render, text = 1),
+                   Gtk.TreeViewColumn("Clave Interna", render, text = 1),
                    Gtk.TreeViewColumn("Nombre", render, text = 2),
                    Gtk.TreeViewColumn("Base", render, text = 3),
                    Gtk.TreeViewColumn("Altura", render, text = 4),

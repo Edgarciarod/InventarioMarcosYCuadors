@@ -4,7 +4,7 @@
 from gi.repository import Gtk
 import psycopg2
 import psycopg2.extras
-global builder, dialog, db,  MainWin
+global builder, dialog, db,  MainWin, model, iter
 
 db = psycopg2.connect(database='Almacen',
                         user='postgres',
@@ -12,11 +12,8 @@ db = psycopg2.connect(database='Almacen',
                         port='5432',
                         host='127.0.0.1')
 
+
 class Handler:
-
-    def onDestroyWindow(self, *args):
-        Gtk.main_quit(*args)
-
     def AceptarButton_clicked(self, button):
         global db, MainWin
         try:
@@ -51,19 +48,144 @@ class Handler:
             print ('ERROR:', e.args)
 
     def MainAcceptButton_clicked(self, button):
-        global dialog
-        #dialog.set_visible(True)
+        global builder, dialog
+        tmp = builder.get_object("window2")
+        tmp.destroy()
+        tmp = builder.get_object("window3")
+        tmp.destroy()
+        dialog.destroy()
+
+        try:
+            dict_cursor = db.cursor()
+            try:
+                dict_cursor.execute("SELECT actualizar_nuevo_material();")
+                dict_cursor.execute("TRUNCATE entrada_almacen;")
+            except psycopg2.IntegrityError:
+                db.rollback()
+            else:
+                db.commit()
+            dict_cursor.close()
+        except Exception as e:
+            print ('ERROR:',type(e) ,e.args)
+
 
     def MainCancelButton_clicked(self, button):
         global builder, dialog
         tmp = builder.get_object("window2")
         tmp.destroy()
+        tmp = builder.get_object("window3")
+        tmp.destroy()
         dialog.destroy()
+        try:
+            dict_cursor = db.cursor()
+            try:
+                dict_cursor.execute("TRUNCATE entrada_almacen;")
+            except psycopg2.IntegrityError:
+                db.rollback()
+            else:
+                db.commit()
+            dict_cursor.close()
+        except Exception as e:
+            print ('ERROR:',type(e) ,e.args)
 
 
     def MainAddButton_clicked(self, button):
         global dialog
         dialog.set_visible(True)
+
+
+    def MainEditButton_clicked(self, button):
+        global MainWin, db, builder, model, iter
+        #global dialog
+        dialog = builder.get_object("window3")
+        try:
+            (model, iter) = MainWin.TreeView.get_selection().get_selected()
+            row = []
+            if iter != None:
+                row = list(model[iter])
+                #print(row)
+                builder.get_object("ClaveMolduraEdit_entry").set_text(row[1])
+                builder.get_object("ClaveMolduraEdit_entry").set_editable(False)
+                builder.get_object("PrecioUnitarioEdit_entry").set_text(row[5])
+                builder.get_object("CantidadEdit_entry").set_text("%.0f"%(float(row[4])/64))
+                dialog.set_visible(True)
+        except Exception as e:
+            print ('ERROR:', e.args)
+
+    def AcceptOnEditButton_clicked(self,button):
+        global db, MainWin, builder
+        try:
+            dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            try:
+                clave_moldura = builder.get_object("ClaveMolduraEdit_entry").get_text()
+                cantidad = builder.get_object("CantidadEdit_entry").get_text()
+                precio_unitario = builder.get_object("PrecioUnitarioEdit_entry").get_text()
+
+                dict_cursor.execute("""SELECT moldura_id FROM maestro_moldura
+                                    WHERE clave_interna = %s or  clave_proveedor = %s;""",
+                                    (clave_moldura, clave_moldura))
+
+                for i in dict_cursor:
+                    moldura_id = i['moldura_id']
+
+                dict_cursor.execute("""UPDATE entrada_almacen
+                           SET cantidad = %s,  precio_unitario = %s
+                           WHERE moldura_id = %s ;""", (int(cantidad), float(precio_unitario), int(moldura_id)))
+
+
+            except psycopg2.IntegrityError:
+                db.rollback()
+            else:
+                db.commit()
+                dialog = builder.get_object("window3")
+                dialog.set_visible(False)
+                builder.get_object("ClaveMoldura_entry").set_text("")
+                builder.get_object("PrecioUnitario_entry").set_text("")
+                builder.get_object("Cantidad_entry").set_text("")
+            dict_cursor.close()
+            MainWin.lista.clear()
+            MainWin.addTreeView()
+        except Exception as e:
+            print ('ERROR:', e.args, type(e))
+
+    def CancelOnEditButton_clicked(self,button):
+        global  builder
+        dialog = builder.get_object("window3")
+        dialog.set_visible(False)
+
+    def MainDeleteButton_clicked(self,button):
+        global db, MainWin, builder
+        try:
+            (model, iter) = MainWin.TreeView.get_selection().get_selected()
+            row = []
+            if iter != None:
+                row = list(model[iter])
+            else:
+                print("Not found :(")
+            dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            try:
+                clave_moldura = row[1]
+                dict_cursor.execute("""SELECT moldura_id FROM maestro_moldura
+                                    WHERE clave_interna = %s or  clave_proveedor = %s;""",
+                                    (clave_moldura, clave_moldura))
+
+                for i in dict_cursor:
+                    moldura_id = i['moldura_id']
+
+
+                dict_cursor.execute("""DELETE FROM entrada_almacen
+                           WHERE moldura_id = %s ;""", ( int(moldura_id), ))
+
+
+            except psycopg2.IntegrityError:
+                db.rollback()
+            else:
+                db.commit()
+            dict_cursor.close()
+            MainWin.lista.clear()
+            MainWin.addTreeView()
+        except Exception as e:
+            print ('ERROR:', e.args, type(e))
 
     def CancelarButton_clicked(self, button):
         global builder
@@ -74,7 +196,7 @@ class Handler:
 
 class WinNuevoPedido:
     def __init__(self):
-        global builder, dialog, MainWin
+        global builder, dialog, MainWin,db
         MainWin = self
         builder = Gtk.Builder()
         builder.add_from_file("gui/NuevoPedido.glade")
@@ -82,6 +204,18 @@ class WinNuevoPedido:
         builder.connect_signals(Handler())
         self.TreeView = builder.get_object("treeview")
         self.initTreeView()
+        #self.addTreeView()
+        try:
+            dict_cursor = db.cursor()
+            try:
+                dict_cursor.execute("TRUNCATE entrada_almacen;")
+            except psycopg2.IntegrityError:
+                db.rollback()
+            else:
+                db.commit()
+            dict_cursor.close()
+        except Exception as e:
+            print ('ERROR:',type(e) ,e.args)
 
     def addTreeView(self):
         try:
@@ -100,11 +234,11 @@ class WinNuevoPedido:
                     j = [i['nombre_moldura'],
                          i['clave_interna'],
                          i['clave_proveedor'],
-                         i['cantidad']*64*0.3048,
-                         i['cantidad']*64,
-                         i['precio_unitario'],
-                         i['precio_unitario']/64*3.2808399]
-                    j = [str(k) for k in j]
+                         "%.2f"%(i['cantidad']*64*0.3048),
+                         "%d"%(i['cantidad']*64),
+                         "%.2f"%(i['precio_unitario']),
+                         "%.2f"%(i['precio_unitario']/64*3.2808399) ]
+
                     self.lista.append(j)
             except psycopg2.IntegrityError:
                 print("NOOOO")
@@ -139,3 +273,11 @@ class WinNuevoPedido:
 def NuevoPedido():
     WinNuevoPedido()
     Gtk.main()
+    db.close()
+    tmp = builder.get_object("window1")
+    tmp.destroy()
+    tmp = builder.get_object("window2")
+    tmp.destroy()
+    tmp = builder.get_object("window3")
+    tmp.destroy()
+    Gtk.main_quit()

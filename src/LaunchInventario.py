@@ -37,6 +37,7 @@ class Handler:
             clave_moldura = datos[1]
             total = float(datos[5])
 
+
             if estado == 0:
                 dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 

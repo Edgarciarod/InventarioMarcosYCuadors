@@ -21,7 +21,7 @@ class Handler:
     def Editar_clicked(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            clave_interna = list(model[iter])[0]
+            clave_interna = list(model[iter])[1]
             EditarMolduraCatalogoMaestro.EditarMolduraCatalogoMaestro(clave_interna)
             MainW.lista.clear()
             WinCatalogoMaestro.addTreeView(MainW)
@@ -29,7 +29,8 @@ class Handler:
     def Activate_clicked(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            clave_interna = list(model[iter])[0]
+            print ("Entró")
+            clave_interna = list(model[iter])[1]
             cursor = db.cursor()
             cursor.execute("UPDATE maestro_moldura SET activo = TRUE WHERE clave_interna = %s", (clave_interna,))
             MainW.lista.clear()
@@ -40,7 +41,7 @@ class Handler:
     def Desactivate_clicked(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            clave_interna = list(model[iter])[0]
+            clave_interna = list(model[iter])[1]
             cursor = db.cursor()
             cursor.execute("UPDATE maestro_moldura SET activo = FALSE WHERE clave_interna = %s", (clave_interna,))
             MainW.lista.clear()
@@ -63,17 +64,18 @@ class WinCatalogoMaestro:
 
     def initTreeView(self):
 
-        self.lista = Gtk.ListStore(str, str, str, str, str, str, str, str)
+        self.lista = Gtk.ListStore(str, str, str, str, str, str, str, str, str)
         render = Gtk.CellRendererText()
 
-        columna = [Gtk.TreeViewColumn("Clave Interna", render, text = 0),
-                   Gtk.TreeViewColumn("Clave Externa", render, text = 1),
-                   Gtk.TreeViewColumn("Nombre", render, text = 2),
-                   Gtk.TreeViewColumn("Precio Unitario (mxn/m)", render, text = 3),
-                   Gtk.TreeViewColumn("Ancho Moldura (m)", render, text = 4),
-                   Gtk.TreeViewColumn("Punto Reorden (m)", render, text = 5),
-                   Gtk.TreeViewColumn("Descripción", render, text = 6),
-                   Gtk.TreeViewColumn("Activo", render, text = 7)]
+        columna = [Gtk.TreeViewColumn("ID", render, text = 0),
+                   Gtk.TreeViewColumn("Clave Interna", render, text = 1),
+                   Gtk.TreeViewColumn("Clave Externa", render, text = 2),
+                   Gtk.TreeViewColumn("Nombre", render, text = 3),
+                   Gtk.TreeViewColumn("Precio Unitario (mxn/m)", render, text = 4),
+                   Gtk.TreeViewColumn("Ancho Moldura (m)", render, text = 5),
+                   Gtk.TreeViewColumn("Punto Reorden (m)", render, text = 6),
+                   Gtk.TreeViewColumn("Descripción", render, text = 7),
+                   Gtk.TreeViewColumn("Activo", render, text = 8)]
 
         self.TreeView.set_model(self.lista)
         self.addTreeView()
@@ -88,6 +90,7 @@ class WinCatalogoMaestro:
 
         cursor.execute("SELECT * FROM maestro_moldura ORDER BY clave_interna, nombre_moldura")
         for row in cursor:
+            id            = str(row['moldura_id'])
             clave_interna = str(row['clave_interna'])
             clave_externa = str(row['clave_proveedor'])
             precio        = str(row['precio_unitario'])
@@ -96,7 +99,7 @@ class WinCatalogoMaestro:
             nombre        = str(row['nombre_moldura'])
             descripcion   = str(row['descripcion'])
             activo        = str(row['activo'])
-            self.lista.append([clave_interna, clave_externa, nombre, precio, ancho_moldura, punto_reorden, descripcion, activo])
+            self.lista.append([id, clave_interna, clave_externa, nombre, precio, ancho_moldura, punto_reorden, descripcion, activo])
 
         db.commit()
         cursor.close()

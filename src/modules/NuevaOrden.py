@@ -36,10 +36,14 @@ class Handler:
             try:
                 dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
                 try:
-                    dict_cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s", (clave,))
+                    dict_cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s and activo = TRUE", (clave,))
 
+                    moldura_id = None
                     for i in dict_cursor:
                         moldura_id = i['moldura_id']
+
+                    if moldura_id == None:
+                        raise Exception('No existe la clave %s'%(clave,))
 
                     dict_cursor.execute("""INSERT INTO
                                         orden_salida_moldura(folio, tienda_id, base_marco, altura_marco, moldura_id)

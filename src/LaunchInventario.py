@@ -2,10 +2,12 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario, Error
-from modules import TipoDeCambio
+from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario, ConsultaReal
+from modules import Error
+from modules import TipoDeCambio, PuntoCriticoLabel
 import psycopg2
 import psycopg2.extras
+global builder, db, MainW
 import subprocess
 global db, MainW
 
@@ -15,11 +17,13 @@ class Handler:
 
 
     def CapturarInventario(self, *args):
+        global builder
         cursor  = db.cursor()
         cursor.execute("TRUNCATE TABLE inventario_temporal")
         db.commit()
         cursor.close()
         NewInventario.NewInventario()
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
 
 
     def NuevaOrdenSalida(self, button):
@@ -29,13 +33,20 @@ class Handler:
 
 
     def ProcesarOrden(self, button):
-        global db
+        global db, builder
         (model, iter) = MainW.TreeView.get_selection().get_selected()
 
         if iter != None:
             datos = list(model[iter])
             folio  = int(datos[0])
-            estado = int(datos[7])
+            estado = datos[7]
+            if estado == "En espera":
+                estado = 0
+            else:
+                if estado == "Procesado":
+                    estado = 1
+                else:
+                    estado = 2
             clave_moldura = datos[1]
             total = float(datos[5])
 
@@ -48,6 +59,7 @@ class Handler:
                     moldura_id = i['moldura_id']
 
                 dict_cursor.execute("SELECT cantidad FROM inventario_teorico WHERE moldura_id = %s",(moldura_id,))
+                cantidad = 0
                 for i in dict_cursor:
                     cantidad = i['cantidad']
 
@@ -57,17 +69,30 @@ class Handler:
                         db.commit()
                         MainW.lista.clear()
                         MainWin.addTreeView(MainW)
+                    else:
+                        raise Exception("No hay moldura suficiente")
                 except Exception as e:
                     Error.Error(str(e))
 
                 db.commit()
                 dict_cursor.close()
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
 
 
     def CancelarOrden(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            estado = int(list(model[iter])[7])
+            estado = list(model[iter][7])[0]
+            print(estado)
+            if estado == "E":
+                estado = 0
+            else:
+                if estado == "P":
+                    estado = 1
+                else:
+                    estado = 2
+
+            print (estado)
             folio  = int(list(model[iter])[0])
             if estado == 0:
                 dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -79,7 +104,8 @@ class Handler:
 
 
     def CapturarPedido(self, button):
-        NuevoPedido.NuevoPedido()
+        global builder
+        NuevoPedido.NuevoPedido(builder.get_object("NumCriticoLabel"))
 
 
     def CatalogoMaestro(self, button):
@@ -87,11 +113,17 @@ class Handler:
 
 
     def ReportarMerma(self, button):
+        global builder
         ReportarMerma.ReportarMerma()
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
 
 
     def ConsultaInventario(self, button):
         ConsultaInventario.ConsultaInventario()
+
+    def ConsultaReal(self, button):
+        ConsultaReal.ConsultaReal()
+
 
     def ReporteCosteoButton_clicked(self, button):
         nombre_archivo = subprocess.check_output(["python", "./modules/GeneraReporteCosteo.py"])
@@ -100,7 +132,7 @@ class Handler:
 
 class MainWin:
     def __init__(self):
-        global MainW
+        global MainW, builder
         MainW = self
         builder = Gtk.Builder()
 
@@ -118,11 +150,14 @@ class MainWin:
         else:
             actualizado_label.set_markup('<span color = "#0C9E16">Actualizado</span>')
 
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
+
 
     def addTreeView(self):
         global db
 
-        dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        dict_cursor  = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        dict_cursor2 = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         dict_cursor.execute("""SELECT folio, base_marco, altura_marco, estado, fecha_recepcion, fecha_procesado, tienda_id,
                                clave_interna, nombre_moldura
@@ -138,11 +173,18 @@ class MainWin:
             altura = row['altura_marco']
             total  = base*2 + altura*2
 
-            dict_cursor.execute("SELECT direccion FROM tienda WHERE tienda_id = %s",(row['tienda_id'],))
-            for i in dict_cursor:
+            dict_cursor2.execute("SELECT direccion FROM tienda WHERE tienda_id = %s",(row['tienda_id'],))
+            for i in dict_cursor2:
                 tienda = i['direccion']
 
             estado    = row['estado']
+            if estado == 0:
+                estado = "En espera"
+            else:
+                if  estado == 1:
+                    estado = "Procesado"
+                else:
+                    estado = "Cancelado"
             fecha_rec = str(row['fecha_recepcion']).split('.')[0]
             fecha_pro = str(row['fecha_procesado']).split('.')[0]
 
@@ -150,6 +192,7 @@ class MainWin:
             self.lista.append(datos)
 
         db.commit()
+        dict_cursor2.close()
         dict_cursor.close()
 
     def initTreeView(self):

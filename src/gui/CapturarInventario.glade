@@ -2,7 +2,7 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkWindow" id="window1">
-    <property name="width_request">680</property>
+    <property name="width_request">800</property>
     <property name="height_request">500</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -46,10 +46,11 @@
                 <property name="layout_style">start</property>
                 <child>
                   <object class="GtkButton" id="NuevaMolduraButton">
-                    <property name="label" translatable="yes">Nueva Moldura</property>
+                    <property name="label">gtk-add</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="use_stock">True</property>
                     <signal name="clicked" handler="NuevaMoldura_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -60,10 +61,11 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="EditarButton">
-                    <property name="label" translatable="yes">Editar</property>
+                    <property name="label">gtk-edit</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="use_stock">True</property>
                     <signal name="clicked" handler="Editar_clicked" swapped="no"/>
                   </object>
                   <packing>
@@ -74,10 +76,11 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="EliminarButton">
-                    <property name="label" translatable="yes">Eliminar</property>
+                    <property name="label">gtk-delete</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="use_stock">True</property>
                     <signal name="destroy" handler="onDestroyWindow" swapped="no"/>
                     <signal name="clicked" handler="Eliminar_clicked" swapped="no"/>
                   </object>

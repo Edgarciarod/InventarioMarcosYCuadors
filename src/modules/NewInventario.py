@@ -79,14 +79,15 @@ class WinNewInventario:
 
     def initTreeView(self):
 
-        self.lista = Gtk.ListStore(str, str, str, str, str)
+        self.lista = Gtk.ListStore(str, str, str, str, str, str)
         render = Gtk.CellRendererText()
 
         columna = [Gtk.TreeViewColumn("Clave Interna", render, text = 0),
                    Gtk.TreeViewColumn("Clave Externa", render, text = 1),
                    Gtk.TreeViewColumn("Cantidad (m)", render, text = 2),
-                   Gtk.TreeViewColumn("Nombre", render, text = 3),
-                   Gtk.TreeViewColumn("Descripción", render, text = 4)]
+                   Gtk.TreeViewColumn("Precio (mxn/m)", render, text = 3),
+                   Gtk.TreeViewColumn("Nombre", render, text = 4),
+                   Gtk.TreeViewColumn("Descripción", render, text = 5)]
 
         self.TreeView.set_model(self.lista)
 
@@ -99,16 +100,17 @@ class WinNewInventario:
 
         cursor.execute("""SELECT inventario_temporal.cantidad, maestro_moldura.clave_interna,
                        maestro_moldura.clave_proveedor, maestro_moldura.nombre_moldura,
-                       maestro_moldura.descripcion
+                       maestro_moldura.descripcion, maestro_moldura.precio_unitario
                        FROM inventario_temporal, maestro_moldura
                        WHERE maestro_moldura.moldura_id = inventario_temporal.moldura_id
                        ORDER BY maestro_moldura.clave_interna, maestro_moldura.nombre_moldura""")
         for row in cursor:
             clave_interna   = row['clave_interna']
             clave_proveedor = row['clave_proveedor']
+            cantidad        = row['cantidad']
+            precio          = row['precio_unitario']
             nombre          = row['nombre_moldura']
             descripcion     = row['descripcion']
-            cantidad        = row['cantidad']
 
             self.lista.append([str(clave_interna), str(clave_proveedor), str(cantidad), str(nombre), str(descripcion)])
 

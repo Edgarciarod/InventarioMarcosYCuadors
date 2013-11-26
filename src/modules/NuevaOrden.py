@@ -42,6 +42,9 @@ class Handler:
                     for i in dict_cursor:
                         moldura_id = i['moldura_id']
 
+                    if moldura_id == None:
+                        raise Exception('No existe la clave %s'%(clave,))
+
                     dict_cursor.execute("""INSERT INTO
                                         orden_salida_moldura(folio, tienda_id, base_marco, altura_marco, moldura_id)
                                         VALUES(%s, %s, %s, %s, %s)""",

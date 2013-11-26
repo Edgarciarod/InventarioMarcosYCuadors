@@ -56,6 +56,8 @@ class Handler:
                         db.commit()
                         MainW.lista.clear()
                         MainWin.addTreeView(MainW)
+                    else:
+                        raise Exception("No hay moldura suficiente")
                 except Exception as e:
                     Error.Error(str(e))
 
@@ -116,7 +118,8 @@ class MainWin:
     def addTreeView(self):
         global db
 
-        dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        dict_cursor  = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        dict_cursor2 = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         dict_cursor.execute("""SELECT folio, base_marco, altura_marco, estado, fecha_recepcion, fecha_procesado, tienda_id,
                                clave_interna, nombre_moldura
@@ -132,8 +135,8 @@ class MainWin:
             altura = row['altura_marco']
             total  = base*2 + altura*2
 
-            dict_cursor.execute("SELECT direccion FROM tienda WHERE tienda_id = %s",(row['tienda_id'],))
-            for i in dict_cursor:
+            dict_cursor2.execute("SELECT direccion FROM tienda WHERE tienda_id = %s",(row['tienda_id'],))
+            for i in dict_cursor2:
                 tienda = i['direccion']
 
             estado    = row['estado']
@@ -144,6 +147,7 @@ class MainWin:
             self.lista.append(datos)
 
         db.commit()
+        dict_cursor2.close()
         dict_cursor.close()
 
     def initTreeView(self):

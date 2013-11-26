@@ -3,6 +3,7 @@
 
 from gi.repository import Gtk
 from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario, Error
+from modules import TipoDeCambio
 import psycopg2
 import psycopg2.extras
 global db, MainW

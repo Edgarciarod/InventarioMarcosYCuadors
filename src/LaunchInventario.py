@@ -104,6 +104,7 @@ class MainWin:
         self.initTreeView()
         cambio_del_dia = TipoDeCambio.TipoDeCambio()
         actualizado_label = builder.get_object("ActualizadoLabel")
+
         if not cambio_del_dia.is_actualizado():
             actualizado_label.set_markup('<span color = "red">No actualizado</span>')
         else:

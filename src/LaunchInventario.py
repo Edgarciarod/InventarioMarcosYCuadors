@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario
+from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario, Error
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -55,8 +55,8 @@ class Handler:
                         db.commit()
                         MainW.lista.clear()
                         MainWin.addTreeView(MainW)
-                except UnboundLocalError:
-                    pass
+                except Exception as e:
+                    Error.Error(str(e))
 
                 dict_cursor.close()
 
@@ -144,9 +144,9 @@ class MainWin:
         columna = [Gtk.TreeViewColumn("Folio", render, text = 0),
                    Gtk.TreeViewColumn("Clave Interna", render, text = 1),
                    Gtk.TreeViewColumn("Nombre", render, text = 2),
-                   Gtk.TreeViewColumn("Base", render, text = 3),
-                   Gtk.TreeViewColumn("Altura", render, text = 4),
-                   Gtk.TreeViewColumn("Total", render, text = 5),
+                   Gtk.TreeViewColumn("Base (m)", render, text = 3),
+                   Gtk.TreeViewColumn("Altura (m)", render, text = 4),
+                   Gtk.TreeViewColumn("Total (m)", render, text = 5),
                    Gtk.TreeViewColumn("Tienda", render, text = 6),
                    Gtk.TreeViewColumn("Estado", render, text = 7),
                    Gtk.TreeViewColumn("Fecha Recibido", render, text = 8),

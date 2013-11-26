@@ -1,4 +1,5 @@
 from gi.repository import Gtk
+from modules import Error
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -13,25 +14,33 @@ class Handler:
         Cantidad     = builder.get_object("CantidadEntry")
 
         clave_interna = ClaveInterna.get_text()
-        cantidad      = float(Cantidad.get_text())
+        cantidad      = Cantidad.get_text()
 
         try:
             cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             try:
+                cantidad = float(cantidad)
                 cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s", (clave_interna,))
                 datos = list(cursor)
+
+                if len(datos) == 0:
+                    raise Exception('No existe la moldura en el inventario')
+
                 moldura_id = datos[0]['moldura_id']
 
                 cursor.execute("SELECT cantidad FROM inventario_teorico WHERE moldura_id = %s", (moldura_id,))
                 datos = list(cursor)
-                cantidad_actual = datos[0]['cantidad']
 
-                print (cantidad, cantidad_actual)
-                if len(datos) > 0 and cantidad <= cantidad_actual:
-                    cursor.execute("INSERT INTO inventario_desperdicio(moldura_id, cantidad) VALUES(%s, %s)", (moldura_id, cantidad))
+                if len(datos) > 0:
+                    cantidad_actual = datos[0]['cantidad']
+                    if cantidad <= cantidad_actual:
+                        cursor.execute("INSERT INTO inventario_desperdicio(moldura_id, cantidad) VALUES(%s, %s)", (moldura_id, cantidad))
+                    else:
+                        raise Exception('No hay suficiente cantidad en el inventario')
                 else:
-                    pass
-            except (psycopg2.IntegrityError, UnboundLocalError, ValueError):
+                    raise Exception('No existe la moldura en el inventario')
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
@@ -39,6 +48,7 @@ class Handler:
                 window.destroy()
             cursor.close()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:', e.args, type(e))
 
     def Cancel_clicked(self, button):

@@ -112,7 +112,7 @@ class WinNewInventario:
             nombre          = row['nombre_moldura']
             descripcion     = row['descripcion']
 
-            self.lista.append([str(clave_interna), str(clave_proveedor), str(cantidad), str(nombre), str(descripcion)])
+            self.lista.append([str(clave_interna), str(clave_proveedor), str(cantidad), str(precio), str(nombre), str(descripcion)])
 
         db.commit()
         cursor.close()

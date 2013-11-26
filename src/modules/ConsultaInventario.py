@@ -31,7 +31,7 @@ class WinConsultaInventario:
 
     def initTreeView(self):
 
-        self.lista = Gtk.ListStore(str, str, str, str, str, str)
+        self.lista = Gtk.ListStore(str, str, str, str, str, str, bool)
         render = Gtk.CellRendererText()
 
         columna = [Gtk.TreeViewColumn("Clave Interna", render, text = 0),
@@ -39,7 +39,9 @@ class WinConsultaInventario:
                    Gtk.TreeViewColumn("Cantidad (m)", render, text = 2),
                    Gtk.TreeViewColumn("Precio (mxn/m)", render, text = 3),
                    Gtk.TreeViewColumn("Nombre", render, text = 4),
-                   Gtk.TreeViewColumn("Descripción", render, text = 5)]
+                   Gtk.TreeViewColumn("Descripción", render, text = 5),
+                   Gtk.TreeViewColumn("Crítico", render, text = 6)
+        ]
 
         self.TreeView.set_model(self.lista)
 
@@ -54,7 +56,8 @@ class WinConsultaInventario:
         cursor  = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         cursor.execute("""SELECT inventario_teorico.cantidad, maestro_moldura.clave_interna, maestro_moldura.clave_proveedor,
-                       maestro_moldura.nombre_moldura, maestro_moldura.descripcion, maestro_moldura.precio_unitario
+                       maestro_moldura.nombre_moldura, maestro_moldura.descripcion, maestro_moldura.precio_unitario,
+                       maestro_moldura.punto_reorden
                        FROM inventario_teorico, maestro_moldura
                        WHERE inventario_teorico.moldura_id = maestro_moldura.moldura_id
                        ORDER BY maestro_moldura.clave_interna, maestro_moldura.nombre_moldura""")
@@ -65,8 +68,10 @@ class WinConsultaInventario:
             precio          = str(row['precio_unitario'])
             nombre          = str(row['nombre_moldura'])
             descripcion     = str(row['descripcion'])
+            punto_critico   = row['punto_reorden']
+            critico         = True if row['cantidad'] < punto_critico else False
 
-            self.lista.append([clave_interna, clave_proveedor, cantidad, precio, nombre, descripcion])
+            self.lista.append([clave_interna, clave_proveedor, cantidad, precio, nombre, descripcion, critico])
 
         db.commit()
         cursor.close()

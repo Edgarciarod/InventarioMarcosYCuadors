@@ -2,11 +2,12 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario, Error
-from modules import TipoDeCambio
+from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario
+from modules import Error
+from modules import TipoDeCambio, PuntoCriticoLabel
 import psycopg2
 import psycopg2.extras
-global db, MainW
+global builder, db, MainW
 
 class Handler:
     def onDestroyWindow(self, *args):
@@ -14,11 +15,13 @@ class Handler:
 
 
     def CapturarInventario(self, *args):
+        global builder
         cursor  = db.cursor()
         cursor.execute("TRUNCATE TABLE inventario_temporal")
         db.commit()
         cursor.close()
         NewInventario.NewInventario()
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
 
 
     def NuevaOrdenSalida(self, button):
@@ -28,7 +31,7 @@ class Handler:
 
 
     def ProcesarOrden(self, button):
-        global db
+        global db, builder
         (model, iter) = MainW.TreeView.get_selection().get_selected()
 
         if iter != None:
@@ -47,6 +50,7 @@ class Handler:
                     moldura_id = i['moldura_id']
 
                 dict_cursor.execute("SELECT cantidad FROM inventario_teorico WHERE moldura_id = %s",(moldura_id,))
+                cantidad = 0
                 for i in dict_cursor:
                     cantidad = i['cantidad']
 
@@ -63,6 +67,7 @@ class Handler:
 
                 db.commit()
                 dict_cursor.close()
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
 
 
     def CancelarOrden(self, button):
@@ -80,7 +85,8 @@ class Handler:
 
 
     def CapturarPedido(self, button):
-        NuevoPedido.NuevoPedido()
+        global builder
+        NuevoPedido.NuevoPedido(builder.get_object("NumCriticoLabel"))
 
 
     def CatalogoMaestro(self, button):
@@ -88,7 +94,9 @@ class Handler:
 
 
     def ReportarMerma(self, button):
+        global builder
         ReportarMerma.ReportarMerma()
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
 
 
     def ConsultaInventario(self, button):
@@ -96,7 +104,7 @@ class Handler:
 
 class MainWin:
     def __init__(self):
-        global MainW
+        global MainW, builder
         MainW = self
         builder = Gtk.Builder()
 
@@ -113,6 +121,8 @@ class MainWin:
             actualizado_label.set_markup('<span color = "red">No actualizado</span>')
         else:
             actualizado_label.set_markup('<span color = "#0C9E16">Actualizado</span>')
+
+        PuntoCriticoLabel.PuntoCritico(builder.get_object("NumCriticoLabel"))
 
 
     def addTreeView(self):

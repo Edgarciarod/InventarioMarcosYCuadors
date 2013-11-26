@@ -3,10 +3,11 @@
 
 from gi.repository import Gtk
 from modules import Error
+from modules import PuntoCriticoLabel
 import psycopg2
 import psycopg2.extras
 from modules import TipoDeCambio
-global builder, dialog, db,  MainWin, model, iter
+global builder, dialog, db,  MainWin, model, iter, labelCritico
 
 db = psycopg2.connect(database='Almacen',
                         user='postgres',
@@ -52,7 +53,7 @@ class Handler:
             print ('ERROR:', e.args)
 
     def MainAcceptButton_clicked(self, button):
-        global builder, dialog
+        global builder, dialog, labelCritico
         tmp = builder.get_object("window2")
         tmp.destroy()
         tmp = builder.get_object("window3")
@@ -70,6 +71,7 @@ class Handler:
                 db.rollback()
             else:
                 db.commit()
+                PuntoCriticoLabel.PuntoCritico(labelCritico)
             dict_cursor.close()
         except Exception as e:
             Error.Error(str(e))
@@ -292,7 +294,9 @@ class WinNuevoPedido:
             self.TreeView.append_column(col)
 
 
-def NuevoPedido():
+def NuevoPedido(label):
+    global labelCritico
+    labelCritico = label
     WinNuevoPedido()
     Gtk.main()
     db.close()

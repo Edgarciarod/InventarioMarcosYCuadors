@@ -8,6 +8,8 @@ from modules import TipoDeCambio, PuntoCriticoLabel
 import psycopg2
 import psycopg2.extras
 global builder, db, MainW
+import subprocess
+global db, MainW
 
 class Handler:
     def onDestroyWindow(self, *args):
@@ -101,6 +103,12 @@ class Handler:
 
     def ConsultaInventario(self, button):
         ConsultaInventario.ConsultaInventario()
+
+
+    def ReporteCosteoButton_clicked(self, button):
+        nombre_archivo = subprocess.check_output(["python", "./modules/GeneraReporteCosteo.py"])
+        res = nombre_archivo.decode('utf-8')
+        subprocess.Popen(["evince", res])
 
 class MainWin:
     def __init__(self):

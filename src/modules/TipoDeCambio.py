@@ -25,7 +25,7 @@ class TipoDeCambio:
                 i = 0
                 while True:
                     url = "http://currency-api.appspot.com/api/MXN/USD.json?key=54af78659133eca85c31ed7d3d72f00e4407ed3a"
-                    url = urlopen(url)
+                    url = urlopen(url, timeout=2)
                     result = url.read().decode('utf-8')
                     url.close()
                     resultado = json.loads(result)
@@ -40,7 +40,7 @@ class TipoDeCambio:
                 i = 0
                 while True:
                     url = "http://currency-api.appspot.com/api/USD/MXN.json?key=54af78659133eca85c31ed7d3d72f00e4407ed3a"
-                    url = urlopen(url)
+                    url = urlopen(url, timeout=2)
                     result = url.read().decode('utf-8')
                     url.close()
                     resultado = json.loads(result)

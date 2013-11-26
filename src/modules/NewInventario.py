@@ -41,11 +41,16 @@ class Handler:
     def Accept_clicked(self, button):
         cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute("TRUNCATE TABLE comparacion")
-        cursor.execute("INSERT INTO comparacion SELECT * FROM suma_teor_desp()")
-        cursor.execute("SELECT moldura_id, diferencia FROM resta_temp_comp()")
+        cursor.execute("INSERT INTO comparacion SELECT * FROM comp_teor_temp()")
+        cursor.execute("SELECT * FROM desp_plus_comp_teor_temp()")
         with open("comparacion.txt", "w") as out_file:
             for row in cursor:
-                out_file.write("moldura id: " + str(row['moldura_id']) + "\tdiferencia: " + str(row['diferencia']) + "\n")
+                out_file.write("moldura id: " + str(row['moldura_id']) +
+                               "\tinventario teórico: " + str(row['teo_cant']) +
+                               "\tinventario temporal: " + str(row['temp_cant']) +
+                               "\tdiferencia: " + str(row['diferencia']) +
+                               "\tdesperdicio: " + str(row['desp']) + "\n"
+                )
 
         cursor.execute("TRUNCATE TABLE inventario_real")
         cursor.execute("TRUNCATE TABLE inventario_teorico")

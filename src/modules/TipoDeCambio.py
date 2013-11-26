@@ -17,6 +17,8 @@ class TipoDeCambio:
         self.fecha_actulizacion = None
         self.pesos_to_dolares = None
         self.dolares_to_pesos = None
+
+    def actualizar(self):
         try:
             dict_cursor = self.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             try:
@@ -79,4 +81,36 @@ class TipoDeCambio:
         except Exception as e:
             print ('ERROR:', e.args)
             return flag
+
+    def get_mxn_to_usd(self):
+        try:
+            dict_cursor = self.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            try:
+                dict_cursor.execute("""
+                SELECT pesos_a_dolares as rate FROM conversiones ;""")
+                self.pesos_to_dolares = list(dict_cursor)[0]['rate']
+            except psycopg2.IntegrityError:
+                self.db.rollback()
+            else:
+                self.db.commit()
+                return self.pesos_to_dolares
+            dict_cursor.close()
+        except Exception as e:
+            print ('ERROR:', e.args)
+
+    def get_usd_to_mxn(self):
+        try:
+            dict_cursor = self.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            try:
+                dict_cursor.execute("""
+                SELECT dolares_a_pesos as rate FROM conversiones ;""")
+                self.dolares_to_pesos = list(dict_cursor)[0]['rate']
+            except psycopg2.IntegrityError:
+                self.db.rollback()
+            else:
+                self.db.commit()
+                return self.dolares_to_pesos
+            dict_cursor.close()
+        except Exception as e:
+            print ('ERROR:', e.args)
 

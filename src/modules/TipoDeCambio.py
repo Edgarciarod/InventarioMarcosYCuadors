@@ -22,35 +22,22 @@ class TipoDeCambio:
         try:
             dict_cursor = self.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             try:
-                i = 0
-                while True:
-                    url = "http://currency-api.appspot.com/api/MXN/USD.json?key=54af78659133eca85c31ed7d3d72f00e4407ed3a"
-                    url = urlopen(url, timeout=2)
-                    result = url.read().decode('utf-8')
-                    url.close()
-                    resultado = json.loads(result)
-                    if(resultado['success']):
-                        self.pesos_to_dolares = resultado['rate']
-                        break
-                    elif(i <= 2):
-                        i += 1
-                    else:
-                        break
+                url = "http://currency-api.appspot.com/api/MXN/USD.json?key=54af78659133eca85c31ed7d3d72f00e4407ed3a"
+                url = urlopen(url, timeout=4)
+                result = url.read().decode('utf-8')
+                url.close()
+                resultado = json.loads(result)
+                if(resultado['success']):
+                    self.pesos_to_dolares = resultado['rate']
 
-                i = 0
-                while True:
-                    url = "http://currency-api.appspot.com/api/USD/MXN.json?key=54af78659133eca85c31ed7d3d72f00e4407ed3a"
-                    url = urlopen(url, timeout=2)
-                    result = url.read().decode('utf-8')
-                    url.close()
-                    resultado = json.loads(result)
-                    if(resultado['success']):
-                        self.dolares_to_pesos = resultado['rate']
-                        break
-                    elif(i <= 2):
-                        i += 1
-                    else:
-                        break
+                url = "http://currency-api.appspot.com/api/USD/MXN.json?key=54af78659133eca85c31ed7d3d72f00e4407ed3a"
+                url = urlopen(url, timeout=4)
+                result = url.read().decode('utf-8')
+                url.close()
+                resultado = json.loads(result)
+                if(resultado['success']):
+                    self.dolares_to_pesos = resultado['rate']
+
                 dict_cursor.execute("""
                         UPDATE  conversiones
                         SET(dolares_a_pesos, pesos_a_dolares, ultima_actualizacion)
@@ -62,7 +49,7 @@ class TipoDeCambio:
                 self.db.commit()
             dict_cursor.close()
         except Exception as e:
-            print ('ERROR:', e.args)
+            print ('ERROR:', e.args, type(e))
 
     def is_actualizado(self):
         flag = True

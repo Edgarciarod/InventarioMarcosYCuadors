@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario
+from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario, ConsultaReal
 from modules import Error
 from modules import TipoDeCambio, PuntoCriticoLabel
 import psycopg2
@@ -39,7 +39,14 @@ class Handler:
         if iter != None:
             datos = list(model[iter])
             folio  = int(datos[0])
-            estado = int(datos[7])
+            estado = datos[7]
+            if estado == "En espera":
+                estado = 0
+            else:
+                if estado == "Procesado":
+                    estado = 1
+                else:
+                    estado = 2
             clave_moldura = datos[1]
             total = float(datos[5])
 
@@ -75,7 +82,17 @@ class Handler:
     def CancelarOrden(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            estado = int(list(model[iter])[7])
+            estado = list(model[iter][7])[0]
+            print(estado)
+            if estado == "E":
+                estado = 0
+            else:
+                if estado == "P":
+                    estado = 1
+                else:
+                    estado = 2
+
+            print (estado)
             folio  = int(list(model[iter])[0])
             if estado == 0:
                 dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -103,6 +120,9 @@ class Handler:
 
     def ConsultaInventario(self, button):
         ConsultaInventario.ConsultaInventario()
+
+    def ConsultaReal(self, button):
+        ConsultaReal.ConsultaReal()
 
 
     def ReporteCosteoButton_clicked(self, button):
@@ -158,6 +178,13 @@ class MainWin:
                 tienda = i['direccion']
 
             estado    = row['estado']
+            if estado == 0:
+                estado = "En espera"
+            else:
+                if  estado == 1:
+                    estado = "Procesado"
+                else:
+                    estado = "Cancelado"
             fecha_rec = str(row['fecha_recepcion']).split('.')[0]
             fecha_pro = str(row['fecha_procesado']).split('.')[0]
 

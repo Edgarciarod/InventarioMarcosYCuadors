@@ -21,7 +21,7 @@ class Handler:
     def Editar_clicked(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            clave_interna = list(model[iter])[0]
+            clave_interna = list(model[iter])[1]
             EditarMolduraCatalogoMaestro.EditarMolduraCatalogoMaestro(clave_interna)
             MainW.lista.clear()
             WinCatalogoMaestro.addTreeView(MainW)
@@ -29,7 +29,8 @@ class Handler:
     def Activate_clicked(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            clave_interna = list(model[iter])[0]
+            print ("Entró")
+            clave_interna = list(model[iter])[1]
             cursor = db.cursor()
             cursor.execute("UPDATE maestro_moldura SET activo = TRUE WHERE clave_interna = %s", (clave_interna,))
             MainW.lista.clear()
@@ -40,7 +41,7 @@ class Handler:
     def Desactivate_clicked(self, button):
         (model, iter) = MainW.TreeView.get_selection().get_selected()
         if iter != None:
-            clave_interna = list(model[iter])[0]
+            clave_interna = list(model[iter])[1]
             cursor = db.cursor()
             cursor.execute("UPDATE maestro_moldura SET activo = FALSE WHERE clave_interna = %s", (clave_interna,))
             MainW.lista.clear()

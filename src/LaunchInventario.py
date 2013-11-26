@@ -94,7 +94,9 @@ class Handler:
         ConsultaInventario.ConsultaInventario()
 
     def ReporteCosteoButton_clicked(self, button):
-        print(subprocess.call(["python", "./modules/GeneraReporteCosteo.py"]))
+        nombre_archivo = subprocess.check_output(["python", "./modules/GeneraReporteCosteo.py"])
+        res = nombre_archivo.decode('utf-8')
+        subprocess.Popen(["evince", res])
 
 class MainWin:
     def __init__(self):

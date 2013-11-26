@@ -5,6 +5,7 @@ from gi.repository import Gtk
 from modules import Error
 import psycopg2
 import psycopg2.extras
+from modules import TipoDeCambio
 global builder, dialog, db,  MainWin, model, iter
 
 db = psycopg2.connect(database='Almacen',
@@ -61,7 +62,8 @@ class Handler:
         try:
             dict_cursor = db.cursor()
             try:
-                dict_cursor.execute("SELECT actualizar_nuevo_material();")
+                dict_cursor.execute("SELECT actualizar_nuevo_material(%s);",
+                                    (float(TipoDeCambio.TipoDeCambio().get_usd_to_mxn()),))
                 dict_cursor.execute("TRUNCATE entrada_almacen;")
             except Exception as e:
                 Error.Error(str(e))
@@ -232,6 +234,9 @@ class WinNuevoPedido:
             print ('ERROR:',type(e) ,e.args)
 
     def addTreeView(self):
+        cam = TipoDeCambio.TipoDeCambio()
+        print(cam.get_mxn_to_usd())
+
         try:
             dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             try:
@@ -251,7 +256,8 @@ class WinNuevoPedido:
                          "%.2f"%(i['cantidad']*64*0.3048),
                          "%d"%(i['cantidad']*64),
                          "%.2f"%(i['precio_unitario']),
-                         "%.2f"%(i['precio_unitario']/64*3.2808399) ]
+                         "%.2f"%(i['precio_unitario']/64*3.2808399),
+                         "%.2f"%((i['precio_unitario']/64*3.2808399)*cam.get_usd_to_mxn())]
 
                     self.lista.append(j)
             except Exception as e:
@@ -267,16 +273,17 @@ class WinNuevoPedido:
 
     def initTreeView(self):
 
-        self.lista = Gtk.ListStore(str, str, str, str, str, str, str)
+        self.lista = Gtk.ListStore(str, str, str, str, str, str, str, str)
         render = Gtk.CellRendererText()
 
         columna = [Gtk.TreeViewColumn("Nombre", render, text = 0),
                    Gtk.TreeViewColumn("Clave Interna", render, text = 1),
                    Gtk.TreeViewColumn("Clave Externa", render, text = 2),
-                   Gtk.TreeViewColumn("Cantidad (m)", render, text = 3),
-                   Gtk.TreeViewColumn("Cantidad (ft)", render, text = 4),
-                   Gtk.TreeViewColumn("Precio por caja", render, text = 5),
-                   Gtk.TreeViewColumn("Precio por metro", render, text = 6)]
+                   Gtk.TreeViewColumn("Cantidad(m)", render, text = 3),
+                   Gtk.TreeViewColumn("Cantidad(ft)", render, text = 4),
+                   Gtk.TreeViewColumn("Precio por caja(USD)", render, text = 5),
+                   Gtk.TreeViewColumn("Precio por metro(USD)", render, text = 6),
+                   Gtk.TreeViewColumn("Precio por metro(MXN)", render, text = 7)]
 
         self.TreeView.set_model(self.lista)
 

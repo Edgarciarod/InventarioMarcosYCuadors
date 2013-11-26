@@ -30,7 +30,7 @@ class WinConsultaInventario:
 
     def initTreeView(self):
 
-        self.lista = Gtk.ListStore(str, str, str, str, str)
+        self.lista = Gtk.ListStore(str, str, str, str, str, str)
         render = Gtk.CellRendererText()
 
         columna = [Gtk.TreeViewColumn("Clave Interna", render, text = 0),
@@ -59,7 +59,7 @@ class WinConsultaInventario:
             clave_interna   = str(datos[0]['clave_interna'])
             clave_proveedor = str(datos[0]['clave_proveedor'])
             cantidad        = str(row['cantidad'])
-            precio          = str(datos[0]['precio'])
+            precio          = str(datos[0]['precio_unitario'])
             nombre          = str(datos[0]['nombre_moldura'])
             descripcion     = str(datos[0]['descripcion'])
 

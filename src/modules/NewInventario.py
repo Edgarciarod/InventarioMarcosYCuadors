@@ -39,10 +39,15 @@ class Handler:
     def Accept_clicked(self, button):
         cursor = db.cursor()
         cursor.execute("TRUNCATE TABLE inventario_real")
+        print(1)
         cursor.execute("TRUNCATE TABLE inventario_teorico")
+        print(2)
         cursor.execute("SELECT copia_inv_temp()")
+        print(3)
         cursor.execute("TRUNCATE TABLE inventario_temporal")
+        print(4)
         db.commit()
+        print(5)
         window = builder.get_object("window1")
         window.destroy()
 

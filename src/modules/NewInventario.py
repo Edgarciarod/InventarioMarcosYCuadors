@@ -35,11 +35,19 @@ class Handler:
             cursor.execute("DELETE FROM inventario_temporal WHERE moldura_id = %s", (int(moldura_id),))
             MainW.lista.clear()
             WinNewInventario.addTreeView(MainW)
+            cursor.close()
+            db.commit()
 
     def Accept_clicked(self, button):
         cursor = db.cursor()
+        cursor.execute("TRUNCATE TABLE comparacion")
+        cursor.execute("INSERT INTO comparacion SELECT * FROM suma_teor_desp()")
+        cursor.execute("SELECT moldura_id, diferencia FROM resta_temp_comp()")
+        for row in cursor:
+            print(row)
         cursor.execute("TRUNCATE TABLE inventario_real")
         cursor.execute("TRUNCATE TABLE inventario_teorico")
+        cursor.execute("TRUNCATE TABLE inventario_desperdicio")
         cursor.execute("SELECT copia_inv_temp()")
         cursor.execute("TRUNCATE TABLE inventario_temporal")
         db.commit()
@@ -81,23 +89,25 @@ class WinNewInventario:
 
     def addTreeView(self):
         cursor  = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor2 = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        cursor.execute("SELECT moldura_id, cantidad FROM inventario_temporal")
+        cursor.execute("""SELECT inventario_temporal.cantidad, maestro_moldura.clave_interna,
+                       maestro_moldura.clave_proveedor, maestro_moldura.nombre_moldura,
+                       maestro_moldura.descripcion
+                       FROM inventario_temporal, maestro_moldura
+                       WHERE maestro_moldura.moldura_id = inventario_temporal.moldura_id
+                       ORDER BY maestro_moldura.clave_interna, maestro_moldura.nombre_moldura""")
         for row in cursor:
-            cursor2.execute("SELECT clave_interna, clave_proveedor, nombre_moldura, descripcion FROM maestro_moldura WHERE moldura_id = %s",(row['moldura_id'],))
-            datos = list(cursor2)
-
-            clave_interna   = datos[0]['clave_interna']
-            clave_proveedor = datos[0]['clave_proveedor']
-            nombre          = datos[0]['nombre_moldura']
-            descripcion     = datos[0]['descripcion']
+            clave_interna   = row['clave_interna']
+            clave_proveedor = row['clave_proveedor']
+            nombre          = row['nombre_moldura']
+            descripcion     = row['descripcion']
             cantidad        = row['cantidad']
 
             self.lista.append([str(clave_interna), str(clave_proveedor), str(cantidad), str(nombre), str(descripcion)])
 
+        db.commit()
         cursor.close()
-        cursor2.close()
+
 
 def NewInventario():
     global db

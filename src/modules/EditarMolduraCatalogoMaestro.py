@@ -80,6 +80,7 @@ class WinEditarMolduraCatalogoMaestro:
         if datos[0]['descripcion'] != None:
             DescripcionEntry.set_text(datos[0]['descripcion'])
 
+        db.commit()
         cursor.close()
 
 

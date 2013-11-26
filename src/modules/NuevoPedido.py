@@ -25,7 +25,7 @@ class Handler:
                 precio_unitario = builder.get_object("PrecioUnitario_entry").get_text()
 
                 dict_cursor.execute("""SELECT moldura_id FROM maestro_moldura
-                                    WHERE clave_interna = %s or  clave_proveedor = %s;""",
+                                    WHERE (clave_interna = %s or  clave_proveedor = %s) and activo = TRUE;""",
                                     (clave_moldura, clave_moldura))
 
                 for i in dict_cursor:

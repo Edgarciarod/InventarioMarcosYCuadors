@@ -86,7 +86,7 @@ class WinCatalogoMaestro:
     def addTreeView(self):
         cursor  = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        cursor.execute("SELECT * FROM maestro_moldura")
+        cursor.execute("SELECT * FROM maestro_moldura ORDER BY clave_interna, nombre_moldura")
         for row in cursor:
             clave_interna = str(row['clave_interna'])
             clave_externa = str(row['clave_proveedor'])
@@ -98,6 +98,7 @@ class WinCatalogoMaestro:
             activo        = str(row['activo'])
             self.lista.append([clave_interna, clave_externa, nombre, precio, ancho_moldura, punto_reorden, descripcion, activo])
 
+        db.commit()
         cursor.close()
 
 def CatalogoMaestro():

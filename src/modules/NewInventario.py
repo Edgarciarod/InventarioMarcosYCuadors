@@ -5,6 +5,8 @@ from gi.repository import Gtk
 from modules import NuevaMolduraInventario, EditarMolduraInventario, Error
 import psycopg2
 import psycopg2.extras
+import subprocess
+
 global db, MainW
 
 class Handler:
@@ -43,14 +45,13 @@ class Handler:
         cursor.execute("TRUNCATE TABLE comparacion")
         cursor.execute("INSERT INTO comparacion SELECT * FROM comp_teor_temp()")
         cursor.execute("SELECT * FROM desp_plus_comp_teor_temp()")
-        with open("comparacion.txt", "w") as out_file:
-            for row in cursor:
-                out_file.write("moldura id: " + str(row['moldura_id']) +
-                               "\tinventario teórico: " + str(row['teo_cant']) +
-                               "\tinventario temporal: " + str(row['temp_cant']) +
-                               "\tdiferencia: " + str(row['diferencia']) +
-                               "\tdesperdicio: " + str(row['desp']) + "\n"
-                )
+
+        db.commit()
+
+        nombre_archivo = subprocess.check_output(["python", "./modules/GeneraComparacion.py"])
+        res = nombre_archivo.decode('utf-8')
+        print("------path:"+res+"--------")
+        subprocess.Popen(["evince", res])
 
         cursor.execute("TRUNCATE TABLE inventario_real")
         cursor.execute("TRUNCATE TABLE inventario_teorico")

@@ -7,8 +7,9 @@ from modules import Error
 from modules import TipoDeCambio, PuntoCriticoLabel
 import psycopg2
 import psycopg2.extras
-global builder, db, MainW
 import subprocess
+
+global builder, db, MainW
 global db, MainW
 
 class Handler:
@@ -129,6 +130,7 @@ class Handler:
         nombre_archivo = subprocess.check_output(["python", "./modules/GeneraReporteCosteo.py"])
         res = nombre_archivo.decode('utf-8')
         subprocess.Popen(["evince", res])
+
 
 class MainWin:
     def __init__(self):

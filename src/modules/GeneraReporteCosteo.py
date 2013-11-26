@@ -90,7 +90,7 @@ def main():
     GRID_STYLE = TableStyle(
             [('GRID', (0,0), (-1,-2), 0.25, colors.black),
              ('ALIGN', (1,1), (-1,-1), 'RIGHT'),
-             ('BOX',(cord,-1), (cord,-1), 1.0, colors.red)
+             ('BOX',(-1,-1), (-1,-1), 1.0, colors.red)
             ])
     t = Table(data, colWidths=None, rowHeights=None, style=GRID_STYLE)
     #print(data)

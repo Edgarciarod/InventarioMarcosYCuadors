@@ -36,8 +36,9 @@ class Handler:
             try:
                 dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
                 try:
-                    dict_cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s", (clave,))
+                    dict_cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s and activo = TRUE", (clave,))
 
+                    moldura_id = None
                     for i in dict_cursor:
                         moldura_id = i['moldura_id']
 

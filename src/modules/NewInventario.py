@@ -39,12 +39,14 @@ class Handler:
             db.commit()
 
     def Accept_clicked(self, button):
-        cursor = db.cursor()
+        cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute("TRUNCATE TABLE comparacion")
         cursor.execute("INSERT INTO comparacion SELECT * FROM suma_teor_desp()")
         cursor.execute("SELECT moldura_id, diferencia FROM resta_temp_comp()")
-        for row in cursor:
-            print(row)
+        with open("comparacion.txt", "w") as out_file:
+            for row in cursor:
+                out_file.write("moldura id: " + str(row['moldura_id']) + "\tdiferencia: " + str(row['diferencia']) + "\n")
+
         cursor.execute("TRUNCATE TABLE inventario_real")
         cursor.execute("TRUNCATE TABLE inventario_teorico")
         cursor.execute("TRUNCATE TABLE inventario_desperdicio")

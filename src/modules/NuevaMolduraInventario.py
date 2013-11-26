@@ -20,7 +20,7 @@ class Handler:
             try:
                 cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
                 try:
-                    cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s", (clave_interna,))
+                    cursor.execute("SELECT moldura_id FROM maestro_moldura WHERE clave_interna = %s and activo = TRUE", (clave_interna,))
                     datos = list(cursor)
                     if len(datos) > 0:
                         moldura_id = datos[0]['moldura_id']

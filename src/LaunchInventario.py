@@ -3,10 +3,11 @@
 
 from gi.repository import Gtk
 from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario, ConsultaReal
-from modules import Error
+from modules import Error, PrecioDolar
 from modules import TipoDeCambio, PuntoCriticoLabel
 import psycopg2
 import psycopg2.extras
+global builder, db, MainW
 import subprocess
 
 global builder, db, MainW
@@ -131,6 +132,8 @@ class Handler:
         res = nombre_archivo.decode('utf-8')
         subprocess.Popen(["evince", res])
 
+    def ActualizaCambioButton_clicked(self, button):
+        PrecioDolar.PrecioDolar()
 
 class MainWin:
     def __init__(self):

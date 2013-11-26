@@ -3,6 +3,7 @@
 
 from gi.repository import Gtk
 from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, ReportarMerma, ConsultaInventario
+from modules import TipoDeCambio
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -101,6 +102,13 @@ class MainWin:
 
         self.TreeView = builder.get_object("treeview")
         self.initTreeView()
+        cambio_del_dia = TipoDeCambio.TipoDeCambio()
+        actualizado_label = builder.get_object("ActualizadoLabel")
+        if not cambio_del_dia.is_actualizado():
+            actualizado_label.set_markup('<span color = "red">No actualizado</span>')
+        else:
+            actualizado_label.set_markup('<span color = "green">Actualizado</span>')
+
 
     def addTreeView(self):
         global db

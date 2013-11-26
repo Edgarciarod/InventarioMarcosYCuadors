@@ -1,4 +1,5 @@
 from gi.repository import Gtk
+from modules import Error
 import psycopg2
 import psycopg2.extras
 global db, MainW, clave_interna
@@ -20,10 +21,9 @@ class Handler:
                 datos = list(cursor)
                 moldura_id = datos[0]['moldura_id']
 
-                print(moldura_id)
-
                 cursor.execute("UPDATE inventario_temporal SET cantidad = %s", (float(cantidad),))
-            except (psycopg2.IntegrityError, UnboundLocalError, ValueError):
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
@@ -31,6 +31,7 @@ class Handler:
                 window.destroy()
             cursor.close()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:', e.args, type(e))
 
     def Cancel_clicked(self, button):

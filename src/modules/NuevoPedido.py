@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
+from modules import Error
 import psycopg2
 import psycopg2.extras
 from modules import TipoDeCambio
@@ -34,7 +35,8 @@ class Handler:
                 dict_cursor.execute("""INSERT INTO entrada_almacen (moldura_id, cantidad, precio_unitario)
                            VALUES(%s, %s, %s);""", (int(moldura_id), int(cantidad), float(precio_unitario)))
 
-            except psycopg2.IntegrityError:
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
@@ -46,6 +48,7 @@ class Handler:
             MainWin.lista.clear()
             MainWin.addTreeView()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:', e.args)
 
     def MainAcceptButton_clicked(self, button):
@@ -62,12 +65,14 @@ class Handler:
                 dict_cursor.execute("SELECT actualizar_nuevo_material(%s);",
                                     (float(TipoDeCambio.TipoDeCambio().get_usd_to_mxn()),))
                 dict_cursor.execute("TRUNCATE entrada_almacen;")
-            except psycopg2.IntegrityError:
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
             dict_cursor.close()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:',type(e) ,e.args)
 
 
@@ -82,12 +87,14 @@ class Handler:
             dict_cursor = db.cursor()
             try:
                 dict_cursor.execute("TRUNCATE entrada_almacen;")
-            except psycopg2.IntegrityError:
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
             dict_cursor.close()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:',type(e) ,e.args)
 
 
@@ -112,6 +119,7 @@ class Handler:
                 builder.get_object("CantidadEdit_entry").set_text("%.0f"%(float(row[4])/64))
                 dialog.set_visible(True)
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:', e.args)
 
     def AcceptOnEditButton_clicked(self,button):
@@ -135,7 +143,8 @@ class Handler:
                            WHERE moldura_id = %s ;""", (int(cantidad), float(precio_unitario), int(moldura_id)))
 
 
-            except psycopg2.IntegrityError:
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
@@ -148,6 +157,7 @@ class Handler:
             MainWin.lista.clear()
             MainWin.addTreeView()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:', e.args, type(e))
 
     def CancelOnEditButton_clicked(self,button):
@@ -179,7 +189,8 @@ class Handler:
                            WHERE moldura_id = %s ;""", ( int(moldura_id), ))
 
 
-            except psycopg2.IntegrityError:
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
@@ -187,6 +198,7 @@ class Handler:
             MainWin.lista.clear()
             MainWin.addTreeView()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:', e.args, type(e))
 
     def CancelarButton_clicked(self, button):
@@ -211,12 +223,14 @@ class WinNuevoPedido:
             dict_cursor = db.cursor()
             try:
                 dict_cursor.execute("TRUNCATE entrada_almacen;")
-            except psycopg2.IntegrityError:
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
             dict_cursor.close()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:',type(e) ,e.args)
 
     def addTreeView(self):
@@ -246,12 +260,14 @@ class WinNuevoPedido:
                          "%.2f"%((i['precio_unitario']/64*3.2808399)*cam.get_usd_to_mxn())]
 
                     self.lista.append(j)
-            except psycopg2.IntegrityError:
+            except Exception as e:
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
             dict_cursor.close()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:',type(e) ,e.args)
 
 

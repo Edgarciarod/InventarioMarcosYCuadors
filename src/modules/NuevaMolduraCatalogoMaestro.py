@@ -1,4 +1,5 @@
 from gi.repository import Gtk
+from modules import Error
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -13,30 +14,41 @@ class Handler:
 
         clave_interna   = builder.get_object("ClaveInternaEntry").get_text()
         clave_proveedor = builder.get_object("ClaveProveedorEntry").get_text()
-        precio_unitario = float(builder.get_object("PrecioUnitarioEntry").get_text())
-        ancho_moldura   = float(builder.get_object("AnchoMolduraEntry").get_text())
-        punto_reorden   = float(builder.get_object("PuntoReordenEntry").get_text())
+        precio_unitario = builder.get_object("PrecioUnitarioEntry").get_text()
+        ancho_moldura   = builder.get_object("AnchoMolduraEntry").get_text()
+        punto_reorden   = builder.get_object("PuntoReordenEntry").get_text()
         nombre          = builder.get_object("NombreEntry").get_text()
         descripcion     = builder.get_object("DescripcionEntry").get_text()
 
         try:
-            cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            precio_unitario = None if precio_unitario == "" else float(precio_unitario)
+            ancho_moldura   = None if ancho_moldura == "" else float(ancho_moldura)
+            punto_reorden   = None if punto_reorden == "" else float(punto_reorden)
+            clave_interna   = None if clave_interna == "" else str(clave_interna)
+            clave_proveedor = None if clave_proveedor == "" else str(clave_proveedor)
+
             try:
-                cursor.execute("""INSERT INTO maestro_moldura(clave_interna, clave_proveedor, precio_unitario,
-                                                              ancho_moldura, punto_reorden, nombre_moldura, descripcion)
-                               VALUES(%s, %s, %s, %s, %s, %s, %s)""",
-                               (clave_interna, clave_proveedor, precio_unitario, ancho_moldura, punto_reorden,
-                                nombre, descripcion)
-                )
-            except (psycopg2.IntegrityError, UnboundLocalError, ValueError):
-                db.rollback()
-            else:
-                db.commit()
-                window = builder.get_object("window1")
-                window.destroy()
-            cursor.close()
+                cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                try:
+                    cursor.execute("""INSERT INTO maestro_moldura(clave_interna, clave_proveedor, precio_unitario,
+                                                                  ancho_moldura, punto_reorden, nombre_moldura, descripcion)
+                                   VALUES(%s, %s, %s, %s, %s, %s, %s)""",
+                                   (clave_interna, clave_proveedor, precio_unitario, ancho_moldura, punto_reorden,
+                                    nombre, descripcion)
+                    )
+                except Exception as e:
+                    Error.Error(str(e))
+                    db.rollback()
+                else:
+                    db.commit()
+                    window = builder.get_object("window1")
+                    window.destroy()
+                cursor.close()
+            except Exception as e:
+                Error.Error(str(e))
+                print ('ERROR:', e.args, type(e))
         except Exception as e:
-            print ('ERROR:', e.args, type(e))
+            Error.Error(str(e))
 
 
     def Cancel_clicked(self, button):

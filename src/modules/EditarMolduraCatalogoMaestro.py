@@ -1,4 +1,5 @@
 from gi.repository import Gtk
+from modules import Error
 import psycopg2
 import psycopg2.extras
 global db, MainW, clave_interna
@@ -24,7 +25,7 @@ class Handler:
                 cursor.execute("UPDATE maestro_moldura SET nombre_moldura = %s, descripcion = %s WHERE clave_interna = %s",
                                (nombre, descripcion, clave_interna))
             except Exception as e:
-                print ('ERROR:', e.args, type(e))
+                Error.Error(str(e))
                 db.rollback()
             else:
                 db.commit()
@@ -32,6 +33,7 @@ class Handler:
                 window.destroy()
             cursor.close()
         except Exception as e:
+            Error.Error(str(e))
             print ('ERROR:', e.args, type(e))
 
     def Cancel_clicked(self, button):

@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaMolduraInventario, EditarMolduraInventario
+from modules import NuevaMolduraInventario, EditarMolduraInventario, Error
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -69,7 +69,7 @@ class WinNewInventario:
 
         columna = [Gtk.TreeViewColumn("Clave Interna", render, text = 0),
                    Gtk.TreeViewColumn("Clave Externa", render, text = 1),
-                   Gtk.TreeViewColumn("Cantidad", render, text = 2),
+                   Gtk.TreeViewColumn("Cantidad (m)", render, text = 2),
                    Gtk.TreeViewColumn("Nombre", render, text = 3),
                    Gtk.TreeViewColumn("Descripción", render, text = 4)]
 
@@ -87,6 +87,7 @@ class WinNewInventario:
         for row in cursor:
             cursor2.execute("SELECT clave_interna, clave_proveedor, nombre_moldura, descripcion FROM maestro_moldura WHERE moldura_id = %s",(row['moldura_id'],))
             datos = list(cursor2)
+
             clave_interna   = datos[0]['clave_interna']
             clave_proveedor = datos[0]['clave_proveedor']
             nombre          = datos[0]['nombre_moldura']

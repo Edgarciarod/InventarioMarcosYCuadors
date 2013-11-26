@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
+from modules import Error
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -34,9 +35,10 @@ class WinConsultaInventario:
 
         columna = [Gtk.TreeViewColumn("Clave Interna", render, text = 0),
                    Gtk.TreeViewColumn("Clave Externa", render, text = 1),
-                   Gtk.TreeViewColumn("Cantidad", render, text = 2),
-                   Gtk.TreeViewColumn("Nombre", render, text = 3),
-                   Gtk.TreeViewColumn("Descripción", render, text = 4)]
+                   Gtk.TreeViewColumn("Cantidad (m)", render, text = 2),
+                   Gtk.TreeViewColumn("Precio (mxn/m)", render, text = 3),
+                   Gtk.TreeViewColumn("Nombre", render, text = 4),
+                   Gtk.TreeViewColumn("Descripción", render, text = 5)]
 
         self.TreeView.set_model(self.lista)
 
@@ -52,15 +54,16 @@ class WinConsultaInventario:
 
         cursor.execute("SELECT moldura_id, cantidad FROM inventario_teorico")
         for row in cursor:
-            cursor2.execute("SELECT clave_interna, clave_proveedor, nombre_moldura, descripcion FROM maestro_moldura WHERE moldura_id = %s",(row['moldura_id'],))
+            cursor2.execute("SELECT clave_interna, clave_proveedor, nombre_moldura, descripcion, precio_unitario FROM maestro_moldura WHERE moldura_id = %s",(row['moldura_id'],))
             datos = list(cursor2)
-            clave_interna   = datos[0]['clave_interna']
-            clave_proveedor = datos[0]['clave_proveedor']
-            nombre          = datos[0]['nombre_moldura']
-            descripcion     = datos[0]['descripcion']
-            cantidad        = row['cantidad']
+            clave_interna   = str(datos[0]['clave_interna'])
+            clave_proveedor = str(datos[0]['clave_proveedor'])
+            cantidad        = str(row['cantidad'])
+            precio          = str(datos[0]['precio'])
+            nombre          = str(datos[0]['nombre_moldura'])
+            descripcion     = str(datos[0]['descripcion'])
 
-            self.lista.append([str(clave_interna), str(clave_proveedor), str(cantidad), str(nombre), str(descripcion)])
+            self.lista.append([clave_interna, clave_proveedor, cantidad, precio, nombre, descripcion])
 
         cursor.close()
         cursor2.close()
@@ -74,4 +77,3 @@ def ConsultaInventario():
                           host = '127.0.0.1')
     WinConsultaInventario()
     Gtk.main()
-__author__ = 'david'

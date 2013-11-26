@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from gi.repository import Gtk
-from modules import NuevaMolduraCatalogoMaestro, EditarMolduraCatalogoMaestro
+from modules import NuevaMolduraCatalogoMaestro, EditarMolduraCatalogoMaestro, Error
 import psycopg2
 import psycopg2.extras
 global db, MainW
@@ -69,9 +69,9 @@ class WinCatalogoMaestro:
         columna = [Gtk.TreeViewColumn("Clave Interna", render, text = 0),
                    Gtk.TreeViewColumn("Clave Externa", render, text = 1),
                    Gtk.TreeViewColumn("Nombre", render, text = 2),
-                   Gtk.TreeViewColumn("Precio Unitario", render, text = 3),
-                   Gtk.TreeViewColumn("Ancho Moldura", render, text = 4),
-                   Gtk.TreeViewColumn("Punto Reorden", render, text = 5),
+                   Gtk.TreeViewColumn("Precio Unitario (mxn/m)", render, text = 3),
+                   Gtk.TreeViewColumn("Ancho Moldura (m)", render, text = 4),
+                   Gtk.TreeViewColumn("Punto Reorden (m)", render, text = 5),
                    Gtk.TreeViewColumn("Descripción", render, text = 6),
                    Gtk.TreeViewColumn("Activo", render, text = 7)]
 

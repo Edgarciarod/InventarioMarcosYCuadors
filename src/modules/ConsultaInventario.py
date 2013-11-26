@@ -5,13 +5,14 @@ from gi.repository import Gtk
 from modules import Error
 import psycopg2
 import psycopg2.extras
-global db, MainW
+global builder, db, MainW
 
 class Handler:
     def onDestroyWindow(self, *args):
         Gtk.main_quit(*args)
 
     def Accept_clicked(self, button):
+        global builder
         window = builder.get_object("window1")
         window.destroy()
 
@@ -49,24 +50,26 @@ class WinConsultaInventario:
         self.addTreeView()
 
     def addTreeView(self):
+        global db
         cursor  = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor2 = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        cursor.execute("SELECT moldura_id, cantidad FROM inventario_teorico")
+        cursor.execute("""SELECT inventario_teorico.cantidad, maestro_moldura.clave_interna, maestro_moldura.clave_proveedor,
+                       maestro_moldura.nombre_moldura, maestro_moldura.descripcion, maestro_moldura.precio_unitario
+                       FROM inventario_teorico, maestro_moldura
+                       WHERE inventario_teorico.moldura_id = maestro_moldura.moldura_id
+                       ORDER BY maestro_moldura.clave_interna, maestro_moldura.nombre_moldura""")
         for row in cursor:
-            cursor2.execute("SELECT clave_interna, clave_proveedor, nombre_moldura, descripcion, precio_unitario FROM maestro_moldura WHERE moldura_id = %s",(row['moldura_id'],))
-            datos = list(cursor2)
-            clave_interna   = str(datos[0]['clave_interna'])
-            clave_proveedor = str(datos[0]['clave_proveedor'])
+            clave_interna   = str(row['clave_interna'])
+            clave_proveedor = str(row['clave_proveedor'])
             cantidad        = str(row['cantidad'])
-            precio          = str(datos[0]['precio_unitario'])
-            nombre          = str(datos[0]['nombre_moldura'])
-            descripcion     = str(datos[0]['descripcion'])
+            precio          = str(row['precio_unitario'])
+            nombre          = str(row['nombre_moldura'])
+            descripcion     = str(row['descripcion'])
 
             self.lista.append([clave_interna, clave_proveedor, cantidad, precio, nombre, descripcion])
 
+        db.commit()
         cursor.close()
-        cursor2.close()
 
 def ConsultaInventario():
     global db

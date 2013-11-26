@@ -60,6 +60,7 @@ class Handler:
                 except Exception as e:
                     Error.Error(str(e))
 
+                db.commit()
                 dict_cursor.close()
 
 
@@ -121,23 +122,22 @@ class MainWin:
 
         dict_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        dict_cursor.execute("""SELECT folio, moldura_id, base_marco, altura_marco, estado, fecha_recepcion, fecha_procesado, tienda_id
-                               FROM orden_salida_moldura ORDER BY estado, fecha_recepcion, fecha_procesado""")
+        dict_cursor.execute("""SELECT folio, base_marco, altura_marco, estado, fecha_recepcion, fecha_procesado, tienda_id,
+                               clave_interna, nombre_moldura
+                               FROM orden_salida_moldura, maestro_moldura
+                               WHERE orden_salida_moldura.moldura_id = maestro_moldura.moldura_id
+                               ORDER BY estado, fecha_recepcion, fecha_procesado""")
 
-        dict_cursor2 = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         for row in dict_cursor:
-            folio = row['folio']
-            #print (type(row['moldura_id']))
-            dict_cursor2.execute("SELECT clave_interna, nombre_moldura FROM maestro_moldura WHERE moldura_id = %s",(row['moldura_id'],))
-            for i in dict_cursor2:
-                clave  = i['clave_interna']
-                nombre = i['nombre_moldura']
+            folio  = row['folio']
+            clave  = row['clave_interna']
+            nombre = row['nombre_moldura']
             base   = row['base_marco']
             altura = row['altura_marco']
             total  = base*2 + altura*2
 
-            dict_cursor2.execute("SELECT direccion FROM tienda WHERE tienda_id = %s",(row['tienda_id'],))
-            for i in dict_cursor2:
+            dict_cursor.execute("SELECT direccion FROM tienda WHERE tienda_id = %s",(row['tienda_id'],))
+            for i in dict_cursor:
                 tienda = i['direccion']
 
             estado    = row['estado']
@@ -147,8 +147,8 @@ class MainWin:
             datos = [("%6d"%(folio)).replace(' ', '0'), str(clave), str(nombre), str(base), str(altura), str(total), str(tienda), str(estado), str(fecha_rec), str(fecha_pro)]
             self.lista.append(datos)
 
+        db.commit()
         dict_cursor.close()
-        dict_cursor2.close()
 
     def initTreeView(self):
 

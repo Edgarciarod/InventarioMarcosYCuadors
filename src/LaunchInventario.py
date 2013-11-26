@@ -6,6 +6,7 @@ from modules import NuevaOrden, NuevoPedido, NewInventario, CatalogoMaestro, Rep
 from modules import TipoDeCambio
 import psycopg2
 import psycopg2.extras
+import subprocess
 global db, MainW
 
 class Handler:
@@ -90,6 +91,9 @@ class Handler:
 
     def ConsultaInventario(self, button):
         ConsultaInventario.ConsultaInventario()
+
+    def ReporteCosteoButton_clicked(self, button):
+        print(subprocess.call(["python", "./modules/GeneraReporteCosteo.py"]))
 
 class MainWin:
     def __init__(self):
